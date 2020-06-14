@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+  
+    
+    <entry>
+      <title>guestbook</title>
+      <link href="/2020/06/14/guestbook/"/>
+      <url>/2020/06/14/guestbook/</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>EfficientNet</title>
+      <link href="/2020/06/14/Efficienet/"/>
+      <url>/2020/06/14/Efficienet/</url>
+      
+        <content type="html"><![CDATA[<h3 id="什么是EfficientNet"><a href="#什么是EfficientNet" class="headerlink" title="什么是EfficientNet"></a>什么是EfficientNet</h3><p><strong>EfficientNet</strong>的设想就是能否设计一个标准化的卷积网络扩展方法，既可以实现较高的准确率，又可以充分的节省算力资源。因而问题可以描述成，如何平衡分辨率、深度和宽度这三个维度，来实现网络在效率和准确率上的优化</p><h3 id="复合模型缩放法-compound-scaling-methd"><a href="#复合模型缩放法-compound-scaling-methd" class="headerlink" title="复合模型缩放法(compound scaling methd)"></a>复合模型缩放法(compound scaling methd)</h3><p>谷歌给出的调整方法，以此来实现三个维度上的平衡，让网络的准确率最大化</p><p><img src="https://upload-images.jianshu.io/upload_images/16364886-edab12a4a9bc1f2f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p><a id="more"></a><blockquote><p>在上图中，(a)模型为baseline，(b)-(d)在(a)的基础上分别进行了单一维度的调整，而(e)则同时对三个维度同时进行了一定的调整</p></blockquote><h4 id="把扩展转化为数学问题进行描述"><a href="#把扩展转化为数学问题进行描述" class="headerlink" title="把扩展转化为数学问题进行描述"></a>把扩展转化为数学问题进行描述</h4><p>首先，我们把整个卷积网络称为N，他的第i个卷积层可以看作下面的函数映射：<br>$$Y_i = F_i(X_i)$$<br>Y_i是输出张量，X_i是输入张量，假设这个X_i的维度是&lt;Hi,Wi,Ci&gt;</p><p>最后，我们可以把讲卷积网络N定义为：</p><p><img src="https://upload-images.jianshu.io/upload_images/16364886-c10c34d08d241586.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p><p>其中，下表1…s表示stage的讯号，F_i表示对第i层的卷积运算，L_i的意思是F_i在第i个stage中有Li个一样结构的卷积层。&lt;Hi, Wi, Ci&gt;表示第i层输入的shape。</p><p>为了减小搜索空间，作者先固定了网络的基本结构，而只改变上面公式中的三个缩放维度</p><ul><li>L_i就是网络的深度</li><li>C_i就是通道数，既网络的宽度</li><li>H_i,W_i是分辨率</li></ul><p>就算如此，这也有三个参数要调整，搜索空间也是非常的大，因此EfficientNet的设想是<strong>一个卷积网络所有的卷积层必须通过相同的比例常数进行统一扩展</strong>，这句话的意思是，三个参数乘上常数倍率。所以个一个模型的扩展问题，可以转化为一个<strong>规划问题</strong>：</p><p><img src="https://upload-images.jianshu.io/upload_images/16364886-0be7e5715fe069cf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p><p>其中，优化的目标为模型的准确率，而约束条件为计算资源。这个算式表现为在给定计算内存和效率的约束下，如何优化参数d、w和r来实现最好的模型准确率。</p><h3 id="实验内容"><a href="#实验内容" class="headerlink" title="实验内容"></a>实验内容</h3><p>对于需要调整的三个维度：</p><ul><li><p><strong>Depth</strong>: The intuition is that deeperConvNet can capture richer and more complex features, and</p><p>generalize well on new tasks.</p></li><li><p><strong>Width</strong>: wider networks tend to be able to capture more fine-grained features and are easier to train.</p></li><li><p><strong>Resolution</strong>: With higher resolution input images, ConvNets can potentially capture more fine-grained patterns.</p></li></ul><ol><li>第一个实验，对三个维度固定了两个，只缩放其中一个，得到结果如下：</li></ol><p><img src="https://upload-images.jianshu.io/upload_images/16364886-48bc4215eca20d22.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p><p><strong>结论：三个维度中任一维度的放大都可以带来精度的提升，但是随着倍率的越来越大，提升越来越小。</strong></p><ol start="2"><li>第二个实验，尝试在不同的d，r组合下变动w，得到下图：</li></ol><p><img src="https://upload-images.jianshu.io/upload_images/16364886-4a482053bea62586.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p><p>从实验结果来看，最高精度相比之前已经有所提升，而且组合不同，效果不同。作者又得到了一个观点：得到了更高的精度以及效率的关键是<strong>平衡网络的宽度，网络深度，网络分辨率三个维度的缩放倍率</strong></p><p>之后，作者提出了<strong>模型复合缩放方法</strong>：</p><p><img src="https://upload-images.jianshu.io/upload_images/16364886-cb51ce8fa5da72d0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p><p>考虑到如果网络深度翻番那么对应的计算量翻倍，网络宽度和图像分辨率翻番对应的计算量会翻4倍，卷积操作的计算量与d,w^2, r^2 成正比。在这个约束下，网络的计算量大约是之前的2^ϕ 倍.</p><h3 id="EfficientNet的网络结构"><a href="#EfficientNet的网络结构" class="headerlink" title="EfficientNet的网络结构"></a>EfficientNet的网络结构</h3><p>EfficientNet使用了MobileNet V2中的<strong>MBCConv</strong>作为模型的主干网络，同时也是用了SENet中的<strong>squeeze and excitation</strong>方法对网络结构进行了优化。</p><p><img src="https://upload-images.jianshu.io/upload_images/16364886-75c0d005d95f50e3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p><p>对于EfficientNet-B0这样的一个基线网络，如何使用复合扩展发对该网络进行扩展呢？主要就是分两步走：</p><p><img src="https://upload-images.jianshu.io/upload_images/16364886-cc931ccaea3c1923.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p><p>最后，作者便由此扩展出了一系列的网络结构，如下所示：</p><p><img src="https://upload-images.jianshu.io/upload_images/16364886-3dfb8124f93c8f52.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p><p>而对于普通人来说做扩展的代价过于昂贵，所以最好的方法便是进行迁移学习</p><h4 id="迁移学习和finetune的区别"><a href="#迁移学习和finetune的区别" class="headerlink" title="迁移学习和finetune的区别"></a>迁移学习和finetune的区别</h4><ul><li><strong>finetune：</strong>我们假设在Resnet101后面加上一个全连接层，然后我们锁住前面Resnet的参数，不参加梯度更新，然后只更新最后一个全连接层的参数。当全连接层的loss足够小的时候，再释放所有的参数一起训练。这样Resnet的参数也会微微调整，这就是finetune；</li><li><strong>迁移学习：</strong>就不再训练之前的网络，而是把之前网络的输出的特征看作为我们自己网络的输入特征而已，而不再是一个要训练的网络的概念</li></ul>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Hello World</title>
+      <link href="/2020/06/14/hello-world/"/>
+      <url>/2020/06/14/hello-world/</url>
+      
+        <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+  
+  
+</search>
