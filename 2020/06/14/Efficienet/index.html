@@ -395,14 +395,14 @@
 <h3 id="复合模型缩放法-compound-scaling-methd"><a href="#复合模型缩放法-compound-scaling-methd" class="headerlink" title="复合模型缩放法(compound scaling methd)"></a>复合模型缩放法(compound scaling methd)</h3><p>谷歌给出的调整方法，以此来实现三个维度上的平衡，让网络的准确率最大化</p>
 <p><img src="https://upload-images.jianshu.io/upload_images/16364886-edab12a4a9bc1f2f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
 <a id="more"></a>
-
 <blockquote>
 <p>在上图中，(a)模型为baseline，(b)-(d)在(a)的基础上分别进行了单一维度的调整，而(e)则同时对三个维度同时进行了一定的调整</p>
 </blockquote>
-<h4 id="把扩展转化为数学问题进行描述"><a href="#把扩展转化为数学问题进行描述" class="headerlink" title="把扩展转化为数学问题进行描述"></a>把扩展转化为数学问题进行描述</h4><p>首先，我们把整个卷积网络称为N，他的第i个卷积层可以看作下面的函数映射：<br>$$Y_i = F_i(X_i)$$<br>Y_i是输出张量，X_i是输入张量，假设这个X_i的维度是&lt;Hi,Wi,Ci&gt;</p>
+<h4 id="把扩展转化为数学问题进行描述"><a href="#把扩展转化为数学问题进行描述" class="headerlink" title="把扩展转化为数学问题进行描述"></a>把扩展转化为数学问题进行描述</h4><p>首先，我们把整个卷积网络称为N，他的第i个卷积层可以看作下面的函数映射：</p>
+<script type="math/tex; mode=display">Y_i = F_i(X_i)</script><p>Y_i是输出张量，X_i是输入张量，假设这个X_i的维度是<Hi,Wi,Ci></Hi,Wi,Ci></p>
 <p>最后，我们可以把讲卷积网络N定义为：</p>
 <p><img src="https://upload-images.jianshu.io/upload_images/16364886-c10c34d08d241586.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
-<p>其中，下表1…s表示stage的讯号，F_i表示对第i层的卷积运算，L_i的意思是F_i在第i个stage中有Li个一样结构的卷积层。&lt;Hi, Wi, Ci&gt;表示第i层输入的shape。</p>
+<p>其中，下表1…s表示stage的讯号，F_i表示对第i层的卷积运算，L_i的意思是F_i在第i个stage中有Li个一样结构的卷积层。<Hi, wi, ci>表示第i层输入的shape。</Hi,></p>
 <p>为了减小搜索空间，作者先固定了网络的基本结构，而只改变上面公式中的三个缩放维度</p>
 <ul>
 <li>L_i就是网络的深度</li>
@@ -427,7 +427,7 @@
 </ol>
 <p><img src="https://upload-images.jianshu.io/upload_images/16364886-48bc4215eca20d22.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
 <p><strong>结论：三个维度中任一维度的放大都可以带来精度的提升，但是随着倍率的越来越大，提升越来越小。</strong></p>
-<ol start="2">
+<ol>
 <li>第二个实验，尝试在不同的d，r组合下变动w，得到下图：</li>
 </ol>
 <p><img src="https://upload-images.jianshu.io/upload_images/16364886-4a482053bea62586.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
@@ -580,7 +580,7 @@
                 alt="Songchun Zhang" />
             
               <p class="site-author-name" itemprop="name">Songchun Zhang</p>
-              <p class="site-description motion-element" itemprop="description">���������������</p>
+              <p class="site-description motion-element" itemprop="description">peace</p>
           </div>
 
           <nav class="site-state motion-element">
@@ -601,7 +601,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-count">2</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -612,7 +612,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-count">2</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -878,6 +878,28 @@
   
 
   
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
 
   
 
