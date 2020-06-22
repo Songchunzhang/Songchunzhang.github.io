@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="偏微分方程," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="目录 抛物方程的有限差分方法 冯诺依曼分析法 追赶法   Crank-Nicolson方法 边界条件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="偏微分方程数值解">
+<meta property="og:url" content="http://yoursite.com/2020/06/22/%E5%81%8F%E5%BE%AE%E5%88%86/index.html">
+<meta property="og:site_name" content="Songchun Zhang">
+<meta property="og:description" content="目录 抛物方程的有限差分方法 冯诺依曼分析法 追赶法   Crank-Nicolson方法 边界条件">
+<meta property="og:image" content="http://yoursite.com/2020/06/22/%E5%81%8F%E5%BE%AE%E5%88%86/1.png">
+<meta property="article:published_time" content="2020-06-22T07:34:00.000Z">
+<meta property="article:modified_time" content="2020-06-22T07:37:26.196Z">
+<meta property="article:author" content="Songchun Zhang">
+<meta property="article:tag" content="偏微分方程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/06/22/%E5%81%8F%E5%BE%AE%E5%88%86/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/06/22/偏微分/"/>
+
+
+
+
+
+  <title>偏微分方程数值解 | Songchun Zhang</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Songchun Zhang</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-comment"></i> <br />
+            
+            guestbook
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/22/%E5%81%8F%E5%BE%AE%E5%88%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Songchun Zhang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Songchun Zhang">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">偏微分方程数值解</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-22T15:34:00+08:00">
+                2020-06-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1/" itemprop="url" rel="index">
+                    <span itemprop="name">数学建模</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/06/22/%E5%81%8F%E5%BE%AE%E5%88%86/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2020/06/22/偏微分/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h3><ul>
+<li>抛物方程的有限差分方法<ul>
+<li>冯诺依曼分析法<ul>
+<li>追赶法</li>
+</ul>
+</li>
+<li>Crank-Nicolson方法<ul>
+<li>边界条件</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<a id="more"></a>
+<h3 id="抛物型方程的有限差分方法"><a href="#抛物型方程的有限差分方法" class="headerlink" title="抛物型方程的有限差分方法"></a>抛物型方程的有限差分方法</h3><p>最为常见的抛物型偏微分方程就是热传导方程</p>
+<script type="math/tex; mode=display">\left\{\begin{array}{ll}
+u_{t}=Du_{x x}, & a \leqslant x \leqslant b \quad t \geqslant 0 \\
+u(x, 0)=f(x), & a \leqslant x \leqslant b \\
+u(a, t)=l(t), & t \geqslant 0 \\
+u(b, t)=r(t), & t \geqslant 0
+\end{array}\right.</script><p>它本质上其实是一个初边值问题，直观来看是因为，它既需要初值条件，又需要边值条件。<br>对于偏导数的差分格式，一般分为隐式差分与显式差分两种，下面分别进行介绍。</p>
+<h4 id="显式差分格式"><a href="#显式差分格式" class="headerlink" title="显式差分格式"></a>显式差分格式</h4><p>对于u的一阶导数，可以进行如下的近似：</p>
+<script type="math/tex; mode=display">\frac{u_{n+1}-u_{n}}{h} \simeq u^{\prime}</script><p>其中，$h$为设定的空间步长。如果设定h为单位长度，则</p>
+<script type="math/tex; mode=display">u^{\prime}=\nabla u_{n+1}=u_{n+1}-u_{n}</script><p>其中，$\nabla$是后向差分的符号，而不是梯度运算。<br>由此进而可以推导出$u’’$的表达式为：</p>
+<script type="math/tex; mode=display">u^{\prime \prime}=\nabla u_{n+1}-\nabla u_{n}=u_{n+1}-2 u_{n}+u_{n-1}</script><p>然后，再将$h$代回，便可得到最终的差分格式：</p>
+<script type="math/tex; mode=display">u_{x x}(x, t) \approx \frac{1}{h^{2}}(u(x+h, t)-2 u(x, t)+u(x-h, t))</script><p>该式子中均是对空间的差分，所以$t$并没有变化。<br>在对于时间的差分中，我们便有两种不同的选择，这也对应了显式和隐式差分格式。<br>对于显式差分，其时间的差分方式如下：</p>
+<script type="math/tex; mode=display">u_{t}(x, t) \approx \frac{1}{k}(u(x, t+k)-u(x, t))</script><p>其中，$k$为设定的时间步长。可以引入变量$\sigma = \frac{ck}{h^2}$<br>我们定义$w_{i,j}$就是在$(x,t)$处的<strong>数值解</strong>，那么自然的，我们可以将它按照时间的顺序排列，得到下面的一个形式:</p>
+<script type="math/tex; mode=display">w_{i, j+1}=w_{i j}+\sigma\left(w_{i+1, j}-2 w_{i j}+w_{i-1, j}\right)</script><h4 id="冯诺依曼分析法"><a href="#冯诺依曼分析法" class="headerlink" title="冯诺依曼分析法"></a>冯诺依曼分析法</h4><p>它可以应用在各种常见的偏微分方程中。所谓的冯诺依曼分析法，其本质就是用向量，将所有的空间离散点拼起来。那么这样的话，这个矩阵所对应的表达式就仅仅与时间有关了。这样自然分析就会方便很多。<br>上述的差分形式，可以写成矩阵形式，如下：</p>
+<script type="math/tex; mode=display">\left[\begin{array}{c}
+w_{1, j+1} \\
+\vdots \\
+w_{m, j+1}
+\end{array}\right]=\left[\begin{array}{ccccc}
+1-2 \sigma & \sigma & 0 & \cdots & 0 \\
+\sigma & 1-2 \sigma & \sigma & \ddots & \vdots \\
+0 & \sigma & 1-2 \sigma & \ddots & 0 \\
+\vdots & \ddots & \ddots & \ddots & \sigma \\
+0 & \cdots & 0 & \sigma & 1-2 \sigma
+\end{array}\right]\left[\begin{array}{c}
+w_{1 j} \\
+\vdots \\
+w_{m j}
+\end{array}\right]+\sigma\left[\begin{array}{c}
+w_{0, j} \\
+0 \\
+\vdots \\
+0 \\
+w_{m+1, j}
+\end{array}\right]</script><p>写的紧凑一点，就是公式$W_{j+1} = AW_j + s_j$,那么为了让这个公式收敛，我们显然需要让$A$的最大特征值小于1，最后一般需要$\sigma<2$ 实际的求解中，可以直接进行递推，然后对于首尾直接代入边界条件即可。 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#一维热传导</span></span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">from</span> mpl_toolkits.mplot3d <span class="keyword">import</span> Axes3D</span><br><span class="line"><span class="keyword">import</span> matplotlib.animation <span class="keyword">as</span> animation</span><br><span class="line"></span><br><span class="line">a = <span class="number">1</span></span><br><span class="line"><span class="comment">#第三类边界条件</span></span><br><span class="line">c = <span class="number">1</span></span><br><span class="line"><span class="comment">#dx太小或dt太大可能出错</span></span><br><span class="line">dx = <span class="number">0.01</span></span><br><span class="line">dt = <span class="number">0.00005</span></span><br><span class="line"></span><br><span class="line">x = np.arange(<span class="number">0</span>, <span class="number">1</span>, dx)</span><br><span class="line">t = np.arange(<span class="number">0</span>, <span class="number">1</span>, dt)</span><br><span class="line"></span><br><span class="line">u = np.zeros((len(x), len(t)))</span><br><span class="line"><span class="comment">#初始条件</span></span><br><span class="line">u[:, <span class="number">0</span>] = <span class="number">0</span></span><br><span class="line"><span class="comment">#边界条件</span></span><br><span class="line">m1 = <span class="keyword">lambda</span> t : <span class="number">1</span> + <span class="number">0.0</span> * np.sin(t)</span><br><span class="line">m2 = <span class="keyword">lambda</span> t : <span class="number">2</span> - <span class="number">0.0</span> * np.sin(<span class="number">10</span> * t)</span><br><span class="line"><span class="comment">#构造对角矩阵1，-2，1</span></span><br><span class="line"><span class="comment">#其中diag为对角矩阵，1表示上移一格</span></span><br><span class="line">A = <span class="number">-2</span> * np.eye((len(x))) + np.diag([<span class="number">1</span>] * (len(x) - <span class="number">1</span>), <span class="number">1</span>) + np.diag([<span class="number">1</span>] * (len(x) - <span class="number">1</span>), <span class="number">-1</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> n <span class="keyword">in</span> range(len(t) - <span class="number">1</span>):</span><br><span class="line">    u[:, n + <span class="number">1</span>] = u[:, n] + ((a**<span class="number">2</span> /(dx**<span class="number">2</span>)) * np.dot(A, u[:, n]) + f.T) * dt</span><br><span class="line">    <span class="comment">#第一类边界条件</span></span><br><span class="line">    <span class="comment">#用边界条件确定第一个和最后一个</span></span><br><span class="line">    u[<span class="number">0</span>, n + <span class="number">1</span>] = m1(n + <span class="number">1</span>)</span><br><span class="line">    u[<span class="number">-1</span>, n + <span class="number">1</span>] = m2(n + <span class="number">1</span>)</span><br><span class="line">figure = plt.figure()</span><br><span class="line">ax = Axes3D(figure)</span><br><span class="line">T, X = np.meshgrid(t, x)</span><br><span class="line">ax.plot_surface(X, T, u, cmap=<span class="string">'rainbow'</span>)</span><br><span class="line">plt.xlabel(<span class="string">'x'</span>)</span><br><span class="line">plt.ylabel(<span class="string">'t'</span>)</span><br><span class="line"><span class="comment"># plt.plot(x, u[:, -1])</span></span><br><span class="line"><span class="comment"># plt.grid()</span></span><br><span class="line">plt.show()</span><br></pre></td></tr></table><br>若得到的解出现震荡，则可以适当增加dx或减小dt，最后得到的求解结果如下图：<br><img src="/2020/06/22/%E5%81%8F%E5%BE%AE%E5%88%86/1.png" alt></2$></p>
+<h4 id="隐式差分格式"><a href="#隐式差分格式" class="headerlink" title="隐式差分格式"></a>隐式差分格式</h4><p>与显式差分格式相比所不同的是对时间的差分格式，其差分格式如下</p>
+<script type="math/tex; mode=display">w_{i j}-w_{i, j-1}=\sigma\left(w_{i+1, j}-2 w_{i j}+w_{i-1, j}\right)</script><p>那么也容易通过化简得到我们的矩阵方程:</p>
+<script type="math/tex; mode=display">\left[\begin{array}{ccccc}
+1+2 \sigma & -\sigma & 0 & \cdots & 0 \\
+-\sigma & 1+2 \sigma & -\sigma & \ddots & \vdots \\
+0 & -\sigma & 1+2 \sigma & \ddots & 0 \\
+\vdots & \vdots & \vdots & \vdots & -\sigma \\
+0 & \cdots & 0 & -\sigma & 1+2 \sigma
+\end{array}\right]\left[\begin{array}{c}
+w_{1 j} \\
+\vdots \\
+w_{m j}
+\end{array}\right]=\left[\begin{array}{c}
+w_{1, j-1} \\
+\vdots \\
+w_{m j}-1
+\end{array}\right]+\sigma\left[\begin{array}{c}
+w_{0 j} \\
+0 \\
+\vdots \\
+0 \\
+w_{m+1, j}
+\end{array}\right]</script><p>写成紧凑形式便是，$Aw_j = w_{j-1}+s_j$，我们可以通过计算得到A的特征值为$1+2 \sigma-2 \sigma \cos \frac{\pi j}{m+1}&gt;1$，所以与显式差分相比该格式是<strong>无条件稳定</strong>的。但是并不能直接按时间进行递推求解，需要不断求解矩阵方程，而$A$是以三对角矩阵，较为稀疏，直接对其进行求逆会造成效率低下，于是需要利用<strong>追赶法</strong>进行求解，可以大幅提升求解效率。</p>
+<h4 id="追赶法"><a href="#追赶法" class="headerlink" title="追赶法"></a>追赶法</h4><p>对于一矩阵方程：</p>
+<script type="math/tex; mode=display">AX = d</script><p>其中$A$为一非奇异三对角矩阵，可以对$A$进行LU分解，得到一上三角矩阵和一下三角矩阵。之后可引入中间变量$y = UX$,则有</p>
+<script type="math/tex; mode=display">\begin{array}{l}
+A x=L U x=L y=d \\
+L y=d
+\end{array}</script><p>之后已知$L,d$便可求得$y$,已知$U,y$后便可求得$X$。具体代码实现如下：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> scipy <span class="keyword">import</span> linalg</span><br><span class="line"></span><br><span class="line"><span class="comment">#可解决大规模的三对角的矩阵方程</span></span><br><span class="line"><span class="comment">#如在偏微分方程的求解中</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">b c 0 0</span></span><br><span class="line"><span class="string">a b c 0</span></span><br><span class="line"><span class="string">0 a b c</span></span><br><span class="line"><span class="string">0 0 a b</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">其中b的绝对值</span></span><br><span class="line"><span class="string">大于等于a与c的绝对值之和</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line">A = <span class="number">-2</span> * np.eye((<span class="number">5</span>)) + np.diag([<span class="number">1</span>] * (<span class="number">5</span> - <span class="number">1</span>), <span class="number">1</span>) + np.diag([<span class="number">1</span>] * (<span class="number">5</span> - <span class="number">1</span>), <span class="number">-1</span>)</span><br><span class="line">b = np.array([<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>])</span><br><span class="line"><span class="comment"># print(b[1])</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Thomas</span><span class="params">(La, Mb, Uc, b)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">        La -- [lower item for tri-diagonal matrix] -- [a, a, a]</span></span><br><span class="line"><span class="string">        Mb -- [mian item for tri-diagonal matrix] -- [b, b, b, b]</span></span><br><span class="line"><span class="string">        Uc -- [upper item for tri-diagonal matrix] -- [c, c, c]</span></span><br><span class="line"><span class="string">        b -- [AX = b, where A is the tri-diagonal matrix] [1,1,1,1,1]</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    n = len(Mb)</span><br><span class="line">    Uc[<span class="number">0</span>] = Uc[<span class="number">0</span>] / Mb[<span class="number">0</span>]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, n<span class="number">-1</span>):</span><br><span class="line">        Uc[i] = Uc[i] / (Mb[i] - La[i - <span class="number">1</span>] * Uc[i - <span class="number">1</span>])</span><br><span class="line">    b[<span class="number">0</span>] = b[<span class="number">0</span>] / Mb[<span class="number">0</span>]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, n):</span><br><span class="line">        b[i] = (b[i] - La[i<span class="number">-1</span>]*b[i<span class="number">-1</span>]) / (Mb[i] - La[i<span class="number">-1</span>] * Uc[i<span class="number">-1</span>])</span><br><span class="line">    ls = list(range(n<span class="number">-1</span>))[::<span class="number">-1</span>]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> ls:</span><br><span class="line">        b[i] = b[i] - Uc[i]*b[i+<span class="number">1</span>]</span><br><span class="line">    <span class="keyword">return</span> b</span><br></pre></td></tr></table></figure><br>之后便可利用追赶法和初始条件，遍历时间节点，逐次求解每个时间点的温度。</p>
+<h4 id="Crank-Nicolson方法"><a href="#Crank-Nicolson方法" class="headerlink" title="Crank-Nicolson方法"></a>Crank-Nicolson方法</h4><p>因为之前的两个方法它们的误差是$O(n^2+k^2)$,这其实会有问题就是主要的误差其实都在时间步长上。我们需要把时间步长 取得很小，可能才能够达到我们要的精度。因此$Crank-Nicolson$方法可以很好地弥补这个缺陷。<br>这里我们的$u_t$使用向后差分，和上面那一个一样。而我们的$u_{xx}$使用的是混合差分。具体来说，就是用:</p>
+<script type="math/tex; mode=display">u_{xx}(i,j)=\frac{1}{h^{2}}\left(\frac{1}{2}\left(w_{i+1, j}-2 w_{i j}+w_{i-1, j}\right)+\frac{1}{2}\left(w_{i+1, j-1}-2 w_{i, j-1}+w_{i-1, j-1}\right)\right)</script><p>最后按时间进行整合后得到：</p>
+<script type="math/tex; mode=display">-\sigma w_{i-1, j}+(2+2 \sigma) w_{i j}-\sigma w_{i+1, j}=\sigma w_{i-1, j-1}+(2-2 \sigma) w_{i, j-1}+\sigma w_{i+1, j-1}</script><p>大体上的形式就是 $A \mathbf{w}_{j}=B \mathbf{w}_{j-1}+\sigma\left(\mathbf{s}_{j-1}+\mathbf{s}_{j}\right)$<br>其中：</p>
+<script type="math/tex; mode=display">A=\left(\begin{array}{ccccc}
+2+2 \sigma & -\sigma & 0 & \cdots & 0 \\
+-\sigma & 2+2 \sigma & -\sigma & \ddots & \vdots \\
+0 & -\sigma & 2+2 \sigma & \ddots & 0 \\
+\vdots & \ddots & \ddots & \ddots & -\sigma \\
+0 & \cdots & 0 & -\sigma & 2+2 \sigma
+\end{array}\right)</script><script type="math/tex; mode=display">B=\left(\begin{array}{ccccc}
+2-2 \sigma & \sigma & 0 & \cdots & 0 \\
+\sigma & 2-2 \sigma & \sigma & \ddots & \vdots \\
+0 & \sigma & 2-2 \sigma & \ddots & 0 \\
+\vdots & \ddots & \ddots & \ddots & \sigma \\
+0 & \cdots & 0 & \sigma & 2-2 \sigma
+\end{array}\right)</script><p>可以计算得到$A^{-1}B$的特征值为：</p>
+<script type="math/tex; mode=display">\mu_{j}=\frac{2-2 \sigma+\sigma \lambda_{j}}{2+2 \sigma-\sigma \lambda_{j}}, \lambda_{j}=-2 \cos \pi j /(m+1)</script><p>其特征值也是小于1的，故也是无条件稳定。同时其截断误差为$O(k^2+h^2)$,这比上面两种方法的误差要小很多了</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    Songchun Zhang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://yoursite.com/2020/06/22/%E5%81%8F%E5%BE%AE%E5%88%86/" title="偏微分方程数值解">http://yoursite.com/2020/06/22/%E5%81%8F%E5%BE%AE%E5%88%86/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E5%81%8F%E5%BE%AE%E5%88%86%E6%96%B9%E7%A8%8B/" rel="tag"># 偏微分方程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/06/15/EM%E7%AE%97%E6%B3%95%E5%8F%8A%E6%8E%A8%E5%B9%BF/" rel="next" title="EM算法以及推广">
+                <i class="fa fa-chevron-left"></i> EM算法以及推广
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2020/06/22/偏微分/"
+           data-title="偏微分方程数值解" data-url="http://yoursite.com/2020/06/22/%E5%81%8F%E5%BE%AE%E5%88%86/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="Songchun Zhang" />
+            
+              <p class="site-author-name" itemprop="name">Songchun Zhang</p>
+              <p class="site-description motion-element" itemprop="description">peace</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/Songchunzhang" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:1241400738@qq.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#目录"><span class="nav-number">1.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#抛物型方程的有限差分方法"><span class="nav-number">2.</span> <span class="nav-text">抛物型方程的有限差分方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#显式差分格式"><span class="nav-number">2.1.</span> <span class="nav-text">显式差分格式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#冯诺依曼分析法"><span class="nav-number">2.2.</span> <span class="nav-text">冯诺依曼分析法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#隐式差分格式"><span class="nav-number">2.3.</span> <span class="nav-text">隐式差分格式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#追赶法"><span class="nav-number">2.4.</span> <span class="nav-text">追赶法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Crank-Nicolson方法"><span class="nav-number">2.5.</span> <span class="nav-text">Crank-Nicolson方法</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Songchun Zhang</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>
